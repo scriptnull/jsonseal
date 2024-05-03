@@ -2,7 +2,7 @@
   "payments": [
     {
       "amount": -1,
-      "currency": "USD",
+      "currency": "EUR",
       "payment_mode": "card",
       "payment_detail": {
         "card_number": "4242424242424242",

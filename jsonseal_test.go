@@ -18,17 +18,17 @@ type PaymentRequest struct {
 func (p *PaymentRequest) Validate() error {
 	var validate jsonseal.ValidateAll
 
-	for _, payment := range p.Payments {
+	for idx, payment := range p.Payments {
 		payment := payment
 
-		validate.Check(func() error {
+		validate.Fieldf("payments[%d].amount", idx).Check(func() error {
 			if payment.Amount <= 0 {
 				return errors.New("amount should be greater than 0")
 			}
 			return nil
 		})
 
-		validate.Check(func() error {
+		validate.Fieldf("payments[%d].currency", idx).Check(func() error {
 			if !slices.Contains(SupportedCurrencies, payment.Currency) {
 				return errors.New("unsupported currency")
 			}

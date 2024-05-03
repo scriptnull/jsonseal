@@ -20,29 +20,55 @@ func (v *ValidateAll) Check(validate func() error) {
 	})
 }
 
+func (v *ValidateAll) Field(f string) *FieldChain {
+	return &FieldChain{
+		validator: v,
+		fields:    []string{f},
+	}
+}
+
+func (v *ValidateAll) Fieldf(f string, a ...any) *FieldChain {
+	return &FieldChain{
+		validator: v,
+		fields:    []string{fmt.Sprintf(f, a...)},
+	}
+}
+
+type FieldChain struct {
+	validator *ValidateAll
+	fields    []string
+}
+
+func (fc *FieldChain) Check(validate func() error) {
+	fc.validator.c = append(fc.validator.c, checker{
+		f:      validate,
+		fields: fc.fields,
+	})
+}
+
 type Error struct {
-	fields []string
-	err    error
+	Fields []string `json:"fields"`
+	Err    error    `json:"error"`
 }
 
 func (e *Error) Error() string {
 	var s strings.Builder
 
-	fmt.Fprintf(&s, "error: %s", e.err)
-	if len(e.fields) > 0 {
-		fmt.Fprintf(&s, ", error: %s", strings.Join(e.fields, ","))
+	fmt.Fprintf(&s, "error: %s", e.Err)
+	if len(e.Fields) > 0 {
+		fmt.Fprintf(&s, ", check: %s", strings.Join(e.Fields, ","))
 	}
 
 	return s.String()
 }
 
 type Errors struct {
-	errs []Error
+	Errs []Error
 }
 
 func (errs *Errors) Error() string {
 	var s strings.Builder
-	for _, e := range errs.errs {
+	for _, e := range errs.Errs {
 		fmt.Fprintln(&s, e.Error())
 	}
 	return s.String()
@@ -53,13 +79,13 @@ func (v *ValidateAll) Validate() error {
 	for _, check := range v.c {
 		if err := check.f(); err != nil {
 			errs = append(errs, Error{
-				fields: check.fields,
-				err:    err,
+				Fields: check.fields,
+				Err:    err,
 			})
 		}
 	}
 	if len(errs) > 0 {
-		return &Errors{errs: errs}
+		return &Errors{Errs: errs}
 	}
 	return nil
 }

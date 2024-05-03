@@ -1,6 +1,7 @@
 package jsonseal
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -62,8 +63,22 @@ func (e *Error) Error() string {
 	return s.String()
 }
 
+func (e *Error) String() string {
+	return e.Error()
+}
+
+func (e *Error) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Fields []string `json:"fields"`
+		Err    string   `json:"error"`
+	}{
+		Fields: e.Fields,
+		Err:    e.Err.Error(),
+	})
+}
+
 type Errors struct {
-	Errs []Error
+	Errs []Error `json:"errors"`
 }
 
 func (errs *Errors) Error() string {
@@ -72,6 +87,10 @@ func (errs *Errors) Error() string {
 		fmt.Fprintln(&s, e.Error())
 	}
 	return s.String()
+}
+
+func (errs *Errors) String() string {
+	return errs.Error()
 }
 
 func (v *ValidateAll) Validate() error {

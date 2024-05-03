@@ -174,13 +174,21 @@ func TestWithoutJSONSeal(t *testing.T) {
 
 	err = paymentRequest.Validate()
 	if err != nil {
+		if e, ok := err.(*jsonseal.Errors); ok {
+			b, eerr := json.Marshal(e)
+			if eerr != nil {
+				t.Error(eerr)
+			}
+			t.Error(string(b))
+		}
+
 		t.Error(err)
 	}
 
-	t.Logf("%+v", paymentRequest)
-	for _, p := range paymentRequest.Payments {
-		t.Log(p.Detail)
-	}
+	// t.Logf("%+v", paymentRequest)
+	// for _, p := range paymentRequest.Payments {
+	// 	t.Log(p.Detail)
+	// }
 }
 
 func BenchmarkHeavyValidation(b *testing.B) {

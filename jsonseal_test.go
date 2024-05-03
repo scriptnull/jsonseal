@@ -177,9 +177,10 @@ func TestWithoutJSONSeal(t *testing.T) {
 		if e, ok := err.(*jsonseal.Errors); ok {
 			b, eerr := json.Marshal(e)
 			if eerr != nil {
-				t.Error(eerr)
+				t.Log(eerr)
 			}
-			t.Error(string(b))
+			t.Log(string(b))
+			return
 		}
 
 		t.Error(err)

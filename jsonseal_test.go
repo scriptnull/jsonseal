@@ -21,14 +21,12 @@ func (p *PaymentRequest) Validate() error {
 	for _, payment := range p.Payments {
 		payment := payment
 
-		validate.Check(
-			func() error {
-				if payment.Amount <= 0 {
-					return errors.New("amount should be greater than 0")
-				}
-				return nil
-			},
-		)
+		validate.Check(func() error {
+			if payment.Amount <= 0 {
+				return errors.New("amount should be greater than 0")
+			}
+			return nil
+		})
 
 		validate.Check(func() error {
 			if !slices.Contains(SupportedCurrencies, payment.Currency) {

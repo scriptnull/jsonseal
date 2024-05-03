@@ -1,0 +1,21 @@
+{
+  "payments": [
+    {
+      "amount": -1,
+      "currency": "USD",
+      "payment_mode": "card",
+      "payment_detail": {
+        "card_number": "4242424242424242",
+        "exp_date": "1190"
+      }
+    },
+    {
+      "amount": 8000,
+      "currency": "INR",
+      "payment_mode": "upi",
+      "payment_detail": {
+        "upi_id": "someone@some_bank"
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 package jsonseal_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"os"
@@ -160,52 +161,59 @@ func (c *CardDetail) Valid() (bool, error) {
 	return true, nil
 }
 
-func TestWithoutJSONSeal(t *testing.T) {
-	contents, err := os.ReadFile("testcases/payments.json")
+func TestValidateAll(t *testing.T) {
+	validPayments, err := os.ReadFile("testcases/valid_payments.json")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	var paymentRequest PaymentRequest
-	err = json.Unmarshal(contents, &paymentRequest)
+	invalidPaymentsWithOneError, err := os.ReadFile("testcases/invalid_payments_1.json")
 	if err != nil {
 		t.Fatal(err)
 	}
+	tt := []struct {
+		name        string
+		jsonContent []byte
+		expectedErr error
+	}{
+		{
+			name:        "valid json",
+			jsonContent: validPayments,
+			expectedErr: nil,
+		},
+		{
+			name:        "invalid json with one error inside an array object",
+			jsonContent: invalidPaymentsWithOneError,
+			expectedErr: &jsonseal.Errors{
+				[]jsonseal.Error{
+					{
+						Fields: []string{"payments[0].amount"},
+						Err:    errors.New("amount should be greater than 0"),
+					},
+				},
+			},
+		},
+	}
 
-	err = paymentRequest.Validate()
-	if err != nil {
-		if e, ok := err.(*jsonseal.Errors); ok {
-			b, eerr := json.Marshal(e)
-			if eerr != nil {
-				t.Log(eerr)
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			var paymentRequest PaymentRequest
+			err = json.Unmarshal(tc.jsonContent, &paymentRequest)
+			if err != nil {
+				t.Fatal(err)
 			}
-			t.Log(string(b))
-			return
-		}
 
-		t.Error(err)
-	}
+			err = paymentRequest.Validate()
+			if tc.expectedErr != nil {
+				if tc.expectedErr.Error() != err.Error() {
+					t.Errorf("expected %s, got %s", tc.expectedErr.Error(), err.Error())
+				}
 
-	// t.Logf("%+v", paymentRequest)
-	// for _, p := range paymentRequest.Payments {
-	// 	t.Log(p.Detail)
-	// }
-}
-
-func BenchmarkHeavyValidation(b *testing.B) {
-	contents, err := os.ReadFile("testcases/payments.json")
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	var paymentRequest PaymentRequest
-	err = json.Unmarshal(contents, &paymentRequest)
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	err = paymentRequest.Validate()
-	if err != nil {
-		b.Error(err)
+				gotJsonErr, _ := json.Marshal(err)
+				expectedJsonErr, _ := json.Marshal(tc.expectedErr)
+				if !bytes.Equal(gotJsonErr, expectedJsonErr) {
+					t.Errorf("expected %s, got %s", string(expectedJsonErr), string(gotJsonErr))
+				}
+			}
+		})
 	}
 }

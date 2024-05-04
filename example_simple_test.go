@@ -15,7 +15,7 @@ var paymentRequestWithInsufficientFunds = []byte(`
   "currency": "USD",
   "payment": {
 		"amount": 50,
-		"currency": "USD"
+		"currency": "USD",
 		"payment_mode": "card"
 	}
 }
@@ -28,7 +28,7 @@ type SimplePaymentRequest struct {
 	Payment   struct {
 		Amount   float64     `json:"amount"`
 		Currency Currency    `json:"currency"`
-		Mode     PaymentMode `json:"mode"`
+		Mode     PaymentMode `json:"payment_mode"`
 	} `json:"payment"`
 }
 

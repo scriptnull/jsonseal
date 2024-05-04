@@ -36,7 +36,8 @@ Consider the following JSON, that could arrive in a web request for performing p
   "currency": "USD",
   "payment": {
     "amount": 50,
-    "currency": "USD"
+    "currency": "USD",
+    "payment_mode": "card"
   }
 }
 ```
@@ -48,7 +49,11 @@ func (r *PaymentRequest) Validate() error {
 	var payment jsonseal.CheckGroup
 
 	payment.Check(func() error {
-		if r.Payment.Currency == r.Currency && r.Payment.Amount > r.Balance {
+		if r.Payment.Currency != r.Currency {
+			return errors.New("payment not allowed to different currency")
+		}
+
+		if r.Payment.Amount > r.Balance {
 			return errors.New("insufficent balance")
 		}
 
@@ -56,8 +61,8 @@ func (r *PaymentRequest) Validate() error {
 	})
 
 	payment.Check(func() error {
-		if r.Payment.Currency != r.Currency {
-			return errors.New("payment not allowed to different currency")
+		if !slices.Contains(SupportedPaymentModes, r.Payment.Mode) {
+			return fmt.Errorf("unsupported payment mode")
 		}
 
 		return nil

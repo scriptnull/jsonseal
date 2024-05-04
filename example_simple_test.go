@@ -3,6 +3,7 @@ package jsonseal_test
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/scriptnull/jsonseal"
 )
@@ -15,6 +16,7 @@ var paymentRequestWithInsufficientFunds = []byte(`
   "payment": {
 		"amount": 50,
 		"currency": "USD"
+		"payment_mode": "card"
 	}
 }
 `)
@@ -24,31 +26,36 @@ type SimplePaymentRequest struct {
 	Balance   float64  `json:"balance"`
 	Currency  Currency `json:"currency"`
 	Payment   struct {
-		Amount   float64  `json:"amount"`
-		Currency Currency `json:"currency"`
+		Amount   float64     `json:"amount"`
+		Currency Currency    `json:"currency"`
+		Mode     PaymentMode `json:"mode"`
 	} `json:"payment"`
 }
 
 func (r *SimplePaymentRequest) Validate() error {
-	var payments jsonseal.CheckGroup
+	var payment jsonseal.CheckGroup
 
-	payments.Check(func() error {
-		if r.Payment.Currency == r.Currency && r.Payment.Amount > r.Balance {
+	payment.Check(func() error {
+		if r.Payment.Currency != r.Currency {
+			return errors.New("payment not allowed to different currency")
+		}
+
+		if r.Payment.Amount > r.Balance {
 			return errors.New("insufficent balance")
 		}
 
 		return nil
 	})
 
-	payments.Check(func() error {
-		if r.Payment.Currency != r.Currency {
-			return errors.New("payment not allowed to different currency")
+	payment.Check(func() error {
+		if !slices.Contains(SupportedPaymentModes, r.Payment.Mode) {
+			return fmt.Errorf("unsupported payment mode")
 		}
 
 		return nil
 	})
 
-	return payments.Validate()
+	return payment.Validate()
 }
 
 func Example_simple() {

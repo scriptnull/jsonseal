@@ -74,26 +74,26 @@ type PaymentRequest struct {
 }
 
 func (p *PaymentRequest) Validate() error {
-	var validate jsonseal.ValidateAll
+	var payments jsonseal.CheckGroup
 
 	for idx, payment := range p.Payments {
 		payment := payment
 
-		validate.Fieldf("payments[%d].amount", idx).Check(func() error {
+		payments.Fieldf("payments[%d].amount", idx).Check(func() error {
 			if payment.Amount <= 0 {
 				return errors.New("amount should be greater than 0")
 			}
 			return nil
 		})
 
-		validate.Fieldf("payments[%d].currency", idx).Check(func() error {
+		payments.Fieldf("payments[%d].currency", idx).Check(func() error {
 			if !slices.Contains(SupportedCurrencies, payment.Currency) {
 				return errors.New("unsupported currency")
 			}
 			return nil
 		})
 
-		validate.Check(func() error {
+		payments.Check(func() error {
 			if !slices.Contains(SupportedPaymentModes, payment.Mode) {
 				return errors.New("unspported payment mode")
 			}
@@ -101,7 +101,7 @@ func (p *PaymentRequest) Validate() error {
 			return nil
 		})
 
-		validate.Check(func() error {
+		payments.Check(func() error {
 			if payment.Detail == nil {
 				return errors.New("expected valid payment details")
 			}
@@ -114,7 +114,7 @@ func (p *PaymentRequest) Validate() error {
 		})
 	}
 
-	return validate.Validate()
+	return payments.Validate()
 }
 
 type Payment struct {

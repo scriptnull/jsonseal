@@ -4,48 +4,42 @@ import (
 	"fmt"
 )
 
-type checker struct {
-	f      func() error
-	fields []string
+// Validate could be used to perform the validations and get the validation errors if any
+func Validate(v Validator) error {
+	return v.Validate()
 }
 
-type ValidateAll struct {
+// Validator is the interface that wraps the Validate method
+type Validator interface {
+	Validate() error
+}
+
+// CheckGroup is collection of checker functions that contain validaton rules
+type CheckGroup struct {
 	c []checker
 }
 
-func (v *ValidateAll) Check(validate func() error) {
+func (v *CheckGroup) Check(validate func() error) {
 	v.c = append(v.c, checker{
 		f: validate,
 	})
 }
 
-func (v *ValidateAll) Field(f string) *FieldChain {
+func (v *CheckGroup) Field(f string) *FieldChain {
 	return &FieldChain{
 		validator: v,
 		fields:    []string{f},
 	}
 }
 
-func (v *ValidateAll) Fieldf(f string, a ...any) *FieldChain {
+func (v *CheckGroup) Fieldf(f string, a ...any) *FieldChain {
 	return &FieldChain{
 		validator: v,
 		fields:    []string{fmt.Sprintf(f, a...)},
 	}
 }
 
-type FieldChain struct {
-	validator *ValidateAll
-	fields    []string
-}
-
-func (fc *FieldChain) Check(validate func() error) {
-	fc.validator.c = append(fc.validator.c, checker{
-		f:      validate,
-		fields: fc.fields,
-	})
-}
-
-func (v *ValidateAll) Validate() error {
+func (v *CheckGroup) Validate() error {
 	errs := make([]Error, 0, len(v.c))
 	for _, check := range v.c {
 		if err := check.f(); err != nil {
@@ -59,4 +53,21 @@ func (v *ValidateAll) Validate() error {
 		return &Errors{Errs: errs}
 	}
 	return nil
+}
+
+type checker struct {
+	f      func() error
+	fields []string
+}
+
+type FieldChain struct {
+	validator *CheckGroup
+	fields    []string
+}
+
+func (fc *FieldChain) Check(validate func() error) {
+	fc.validator.c = append(fc.validator.c, checker{
+		f:      validate,
+		fields: fc.fields,
+	})
 }

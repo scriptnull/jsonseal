@@ -12,6 +12,63 @@ import (
 	"github.com/scriptnull/jsonseal"
 )
 
+func TestValidateAll(t *testing.T) {
+	validPayments, err := os.ReadFile("testcases/valid_payments.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	invalidPaymentsWithOneError, err := os.ReadFile("testcases/invalid_payments_1.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tt := []struct {
+		name        string
+		jsonContent []byte
+		expectedErr error
+	}{
+		{
+			name:        "valid json",
+			jsonContent: validPayments,
+			expectedErr: nil,
+		},
+		{
+			name:        "invalid json with one error inside an array object",
+			jsonContent: invalidPaymentsWithOneError,
+			expectedErr: &jsonseal.Errors{
+				[]jsonseal.Error{
+					{
+						Fields: []string{"payments[0].amount"},
+						Err:    errors.New("amount should be greater than 0"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			var paymentRequest PaymentRequest
+			err = json.Unmarshal(tc.jsonContent, &paymentRequest)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = paymentRequest.Validate()
+			if tc.expectedErr != nil {
+				if tc.expectedErr.Error() != err.Error() {
+					t.Errorf("expected %s, got %s", tc.expectedErr.Error(), err.Error())
+				}
+
+				gotJsonErr, _ := json.Marshal(err)
+				expectedJsonErr, _ := json.Marshal(tc.expectedErr)
+				if !bytes.Equal(gotJsonErr, expectedJsonErr) {
+					t.Errorf("expected %s, got %s", string(expectedJsonErr), string(gotJsonErr))
+				}
+			}
+		})
+	}
+}
+
 type PaymentRequest struct {
 	Payments []Payment `json:"payments"`
 }
@@ -159,61 +216,4 @@ func (c *CardDetail) Valid() (bool, error) {
 	// maybe use a library like https://github.com/durango/go-credit-card that takes care of card validation
 
 	return true, nil
-}
-
-func TestValidateAll(t *testing.T) {
-	validPayments, err := os.ReadFile("testcases/valid_payments.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	invalidPaymentsWithOneError, err := os.ReadFile("testcases/invalid_payments_1.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	tt := []struct {
-		name        string
-		jsonContent []byte
-		expectedErr error
-	}{
-		{
-			name:        "valid json",
-			jsonContent: validPayments,
-			expectedErr: nil,
-		},
-		{
-			name:        "invalid json with one error inside an array object",
-			jsonContent: invalidPaymentsWithOneError,
-			expectedErr: &jsonseal.Errors{
-				[]jsonseal.Error{
-					{
-						Fields: []string{"payments[0].amount"},
-						Err:    errors.New("amount should be greater than 0"),
-					},
-				},
-			},
-		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			var paymentRequest PaymentRequest
-			err = json.Unmarshal(tc.jsonContent, &paymentRequest)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			err = paymentRequest.Validate()
-			if tc.expectedErr != nil {
-				if tc.expectedErr.Error() != err.Error() {
-					t.Errorf("expected %s, got %s", tc.expectedErr.Error(), err.Error())
-				}
-
-				gotJsonErr, _ := json.Marshal(err)
-				expectedJsonErr, _ := json.Marshal(tc.expectedErr)
-				if !bytes.Equal(gotJsonErr, expectedJsonErr) {
-					t.Errorf("expected %s, got %s", string(expectedJsonErr), string(gotJsonErr))
-				}
-			}
-		})
-	}
 }

@@ -12,14 +12,7 @@ type Error struct {
 }
 
 func (e *Error) Error() string {
-	var s strings.Builder
-
-	fmt.Fprintf(&s, "error: %s", e.Err)
-	if len(e.Fields) > 0 {
-		fmt.Fprintf(&s, ", check: %s", strings.Join(e.Fields, ","))
-	}
-
-	return s.String()
+	return e.Err.Error()
 }
 
 func (e *Error) String() string {

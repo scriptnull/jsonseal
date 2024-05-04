@@ -28,11 +28,58 @@ go get github.com/scriptnull/jsonseal
 Consider the following JSON, that could arrive in a web request for performing payments.
 
 ```js
-// TODO
+{
+  "account_id": "3ee7b5eb-f3fc-4f0b-9e01-8d7a0fa76f0b",
+  "balance": 15,
+  "currency": "USD",
+  "payment": {
+		"amount": 50,
+		"currency": "USD"
+	}
+}
 ```
 
-There are many aspects about this JSON that we would like to validate.
+A Go struct could be defined like below to parse JSON and perform some validations on top of it.
 
 ```go
-// TODO
+type PaymentRequest struct {
+	AccountID string   `json:"account_id"`
+	Balance   float64  `json:"balance"`
+	Currency  Currency `json:"currency"`
+	Payment   struct {
+		Amount   float64  `json:"amount"`
+		Currency Currency `json:"currency"`
+	} `json:"payment"`
+}
+
+func (r *PaymentRequest) Validate() error {
+	var payments jsonseal.CheckGroup
+
+	payments.Check(func() error {
+		if r.Payment.Currency == r.Currency && r.Payment.Amount > r.Balance {
+			return errors.New("insufficent balance")
+		}
+
+		return nil
+	})
+
+	payments.Check(func() error {
+		if r.Payment.Currency != r.Currency {
+			return errors.New("payment not allowed to different currency")
+		}
+
+		return nil
+	})
+
+	return payments.Validate()
+}
+```
+
+Now use `jsonseal.Unmarshal`instead of `json.Unmarshal` to inflate your struct and perform validation rules.
+
+```go
+err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
+if err != nil {
+  // report error
+}
 ```

@@ -6,3 +6,7 @@
   <span>A JSON validator for Go { ❓ 🧐 ❓ }</span>
   <br>
 </p>
+
+&nbsp;
+
+[![Tests](https://github.com/scriptnull/jsonseal/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/scriptnull/jsonseal/actions/workflows/test.yml)

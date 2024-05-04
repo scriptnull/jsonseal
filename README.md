@@ -33,9 +33,9 @@ Consider the following JSON, that could arrive in a web request for performing p
   "balance": 15,
   "currency": "USD",
   "payment": {
-		"amount": 50,
-		"currency": "USD"
-	}
+    "amount": 50,
+    "currency": "USD"
+  }
 }
 ```
 

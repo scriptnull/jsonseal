@@ -41,23 +41,13 @@ Consider the following JSON, that could arrive in a web request for performing p
 }
 ```
 
-A Go struct could be defined like below to parse JSON and perform some validations on top of it.
+Validation logic for the json could written as shown below:
 
 ```go
-type PaymentRequest struct {
-	AccountID string   `json:"account_id"`
-	Balance   float64  `json:"balance"`
-	Currency  Currency `json:"currency"`
-	Payment   struct {
-		Amount   float64  `json:"amount"`
-		Currency Currency `json:"currency"`
-	} `json:"payment"`
-}
-
 func (r *PaymentRequest) Validate() error {
-	var payments jsonseal.CheckGroup
+	var payment jsonseal.CheckGroup
 
-	payments.Check(func() error {
+	payment.Check(func() error {
 		if r.Payment.Currency == r.Currency && r.Payment.Amount > r.Balance {
 			return errors.New("insufficent balance")
 		}
@@ -65,7 +55,7 @@ func (r *PaymentRequest) Validate() error {
 		return nil
 	})
 
-	payments.Check(func() error {
+	payment.Check(func() error {
 		if r.Payment.Currency != r.Currency {
 			return errors.New("payment not allowed to different currency")
 		}
@@ -73,7 +63,7 @@ func (r *PaymentRequest) Validate() error {
 		return nil
 	})
 
-	return payments.Validate()
+	return payment.Validate()
 }
 ```
 

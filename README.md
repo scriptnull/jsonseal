@@ -12,10 +12,12 @@
 
 &nbsp;
 
-## Design choices
+## Goals
 
-- Writing custom validators should be easy: just write a `func() error`, you got one!
-- In case of a validation error, provide a way to capture information about where the error occured.
+- Validation errors should be human-friendly.
+- Writing custom validators is a breeze. (just write a `func() error`)
+- An [errgroup](https://pkg.go.dev/golang.org/x/sync/errgroup) style API for expressing validation logic.
+- A drop-in replacement for `json.Unmarshal`. (if you wish)
 
 ## Installation
 

@@ -12,3 +12,27 @@
 
 &nbsp;
 
+## Design choices
+
+- Writing custom validators should be easy: just write a `func() error`, you got one!
+- In case of a validation error, provide a way to capture information about where the error occured.
+
+## Installation
+
+```
+go get github.com/scriptnull/jsonseal
+```
+
+## Example
+
+Consider the following JSON, that could arrive in a web request for performing payments.
+
+```js
+// TODO
+```
+
+There are many aspects about this JSON that we would like to validate.
+
+```go
+// TODO
+```

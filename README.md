@@ -75,6 +75,8 @@ func (r *PaymentRequest) Validate() error {
 Now use `jsonseal.Unmarshal`instead of `json.Unmarshal` to inflate your struct and perform validation rules.
 
 ```go
+var paymentRequest PaymentRequest
+
 err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
 if err != nil {
   // report error

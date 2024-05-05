@@ -149,3 +149,53 @@ An example error message that is returned by `jsonseal.JSONIndentFormat` looks l
 }
 ```
 
+## Fields
+
+JSON fields could be associated with the validation errors like this:
+
+```go
+payment.Field("payment.mode").Check(func() error {
+	if !slices.Contains(SupportedPaymentModes, r.Payment.Mode) {
+		return fmt.Errorf("unsupported payment mode: %s", r.Payment.Mode)
+	}
+
+	return nil
+})
+```
+
+The above code associates the json field `payment.mode` with any error that arises from the `Check` block attached to it.
+
+```js
+// before calling Field()
+{
+  "error": "unsupported payment mode: neft"
+}
+
+// after calling Field()
+{
+  "fields": [
+    "payment.mode"
+  ],
+  "error": "unsupported payment mode: neft"
+}
+```
+
+A method called `Fieldf` is available to help with cases like `payments.Fieldf("payments[%d].amount", idx)` (while trying to associate array element as a field).
+
+An error could be asscoiated with multiple different fields by chaining `Field` or `Fieldf`.
+
+```go
+users.Field("sender.id").Field("receiver.id").Check(AreFriends())
+```
+
+This will make sure to associate both fields with the error in case of the validation error.
+
+```js
+{
+  "fields": [
+    "sender.id",
+    "receiver.id"
+  ],
+  "error": "sender and receiver are not friends"
+}
+```

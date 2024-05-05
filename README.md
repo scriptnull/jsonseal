@@ -57,7 +57,7 @@ func (r *PaymentRequest) Validate() error {
 		}
 
 		if r.Payment.Amount > r.Balance {
-			return errors.New("insufficent balance")
+			return errors.New("insufficient balance")
 		}
 
 		return nil

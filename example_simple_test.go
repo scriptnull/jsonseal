@@ -41,7 +41,7 @@ func (r *SimplePaymentRequest) Validate() error {
 		}
 
 		if r.Payment.Amount > r.Balance {
-			return errors.New("insufficent balance")
+			return errors.New("insufficient balance")
 		}
 
 		return nil
@@ -63,6 +63,7 @@ func Example_simple() {
 
 	err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
 	if err != nil {
+
 		fmt.Println("Plain error")
 		fmt.Print(err)
 		fmt.Println()
@@ -79,17 +80,17 @@ func Example_simple() {
 
 	// Output:
 	// Plain error
-	// insufficent balance
+	// insufficient balance
 	// unsupported payment mode: neft
 	//
 	// JSON error
-	// {"errors":[{"error":"insufficent balance"},{"fields":["payment.mode"],"error":"unsupported payment mode: neft"}]}
+	// {"errors":[{"error":"insufficient balance"},{"fields":["payment.mode"],"error":"unsupported payment mode: neft"}]}
 	//
 	// JSON error with indent
 	// {
 	//   "errors": [
 	//     {
-	//       "error": "insufficent balance"
+	//       "error": "insufficient balance"
 	//     },
 	//     {
 	//       "fields": [

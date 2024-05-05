@@ -85,3 +85,51 @@ if err != nil {
   // report error
 }
 ```
+
+## API
+
+## Check Groups
+
+Check groups are a way to group multiple checks and perform validation for them at once.
+
+```go
+var grp1 jsonseal.CheckGroup
+grp1.Check(func() error { /* check condition 1 */ })
+grp1.Check(func() error { /* check condition 2 */ })
+err1 := grp1.Validate()
+
+var grp2 jsonseal.CheckGroup
+grp2.Check(func() error { /* check condition 1 */ })
+grp2.Check(func() error { /* check condition 2 */ })
+err2 := grp1.Validate()
+```
+
+## Errors
+jsonseal comes with built-in error formatters for convenience.
+```go
+err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
+if err != nil {
+	fmt.Println("Plain error")
+	fmt.Print(err)
+	fmt.Println()
+
+	fmt.Println("JSON error")
+	fmt.Println(jsonseal.JSONFormat(err))
+	fmt.Println()
+
+	fmt.Println("JSON error with indent")
+	fmt.Println(jsonseal.JSONIndentFormat(err, "", "  "))
+	fmt.Println()
+	return
+}
+```
+
+But if you wish to get a Go struct that denotes all the validation errors, you could get it like this:
+```go
+err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
+if err != nil {
+		if validationErrors, ok := err.(*jsonseal.Errors); ok {
+			fmt.Println(validationErrors)
+		}
+}
+```

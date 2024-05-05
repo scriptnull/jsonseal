@@ -63,10 +63,19 @@ func Example_simple() {
 
 	err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
 	if err != nil {
+		fmt.Println("Plain error")
 		fmt.Println(err)
+
+		fmt.Println("JSON error")
+		fmt.Println(jsonseal.JSONFormat(err))
 		return
 	}
 
 	// Output:
+	// Plain error
 	// insufficent balance
+	//
+	// JSON error
+	// {"errors":[{"error":"insufficent balance"}]}
+
 }

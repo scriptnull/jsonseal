@@ -101,7 +101,7 @@ err1 := grp1.Validate()
 var grp2 jsonseal.CheckGroup
 grp2.Check(func() error { /* check condition 1 */ })
 grp2.Check(func() error { /* check condition 2 */ })
-err2 := grp1.Validate()
+err2 := grp2.Validate()
 ```
 
 ### Errors

@@ -59,3 +59,18 @@ func JSONFormat(e error) string {
 
 	return string(errContent)
 }
+
+func JSONIndentFormat(e error, prefix string, indent string) string {
+	errContent, err := json.MarshalIndent(e, prefix, indent)
+	if err != nil {
+		errContent, _ = json.MarshalIndent(&Errors{
+			Errs: []Error{
+				{
+					Err: err,
+				},
+			},
+		}, prefix, indent)
+	}
+
+	return string(errContent)
+}

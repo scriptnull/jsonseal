@@ -16,7 +16,7 @@ var paymentRequestWithInsufficientFunds = []byte(`
   "payment": {
 		"amount": 50,
 		"currency": "USD",
-		"payment_mode": "card"
+		"mode": "neft"
 	}
 }
 `)
@@ -28,7 +28,7 @@ type SimplePaymentRequest struct {
 	Payment   struct {
 		Amount   float64     `json:"amount"`
 		Currency Currency    `json:"currency"`
-		Mode     PaymentMode `json:"payment_mode"`
+		Mode     PaymentMode `json:"mode"`
 	} `json:"payment"`
 }
 
@@ -47,7 +47,7 @@ func (r *SimplePaymentRequest) Validate() error {
 		return nil
 	})
 
-	payment.Check(func() error {
+	payment.Field("payment.mode").Check(func() error {
 		if !slices.Contains(SupportedPaymentModes, r.Payment.Mode) {
 			return fmt.Errorf("unsupported payment mode: %s", r.Payment.Mode)
 		}
@@ -64,18 +64,39 @@ func Example_simple() {
 	err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
 	if err != nil {
 		fmt.Println("Plain error")
-		fmt.Println(err)
+		fmt.Print(err)
+		fmt.Println()
 
 		fmt.Println("JSON error")
 		fmt.Println(jsonseal.JSONFormat(err))
+		fmt.Println()
+
+		fmt.Println("JSON error with indent")
+		fmt.Println(jsonseal.JSONIndentFormat(err, "", "  "))
+		fmt.Println()
 		return
 	}
 
 	// Output:
 	// Plain error
 	// insufficent balance
+	// unsupported payment mode: neft
 	//
 	// JSON error
-	// {"errors":[{"error":"insufficent balance"}]}
-
+	// {"errors":[{"error":"insufficent balance"},{"fields":["payment.mode"],"error":"unsupported payment mode: neft"}]}
+	//
+	// JSON error with indent
+	// {
+	//   "errors": [
+	//     {
+	//       "error": "insufficent balance"
+	//     },
+	//     {
+	//       "fields": [
+	//         "payment.mode"
+	//       ],
+	//       "error": "unsupported payment mode: neft"
+	//     }
+	//   ]
+	// }
 }

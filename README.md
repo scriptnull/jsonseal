@@ -133,3 +133,19 @@ if err != nil {
 		}
 }
 ```
+
+An example error message that is returned by `jsonseal.JSONIndentFormat` looks like
+
+```js
+{
+  "errors": [
+    {
+      "error": "insufficient balance"
+    },
+    {
+      "error": "unsupported payment mode: neft"
+    }
+  ]
+}
+```
+

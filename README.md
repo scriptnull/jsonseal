@@ -88,7 +88,7 @@ if err != nil {
 
 ## API
 
-## Check Groups
+### Check Groups
 
 Check groups are a way to group multiple checks and perform validation for them at once.
 
@@ -104,7 +104,7 @@ grp2.Check(func() error { /* check condition 2 */ })
 err2 := grp1.Validate()
 ```
 
-## Errors
+### Errors
 jsonseal comes with built-in error formatters for convenience.
 ```go
 err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
@@ -149,7 +149,7 @@ An example error message that is returned by `jsonseal.JSONIndentFormat` looks l
 }
 ```
 
-## Fields
+### Fields
 
 JSON fields could be associated with the validation errors like this:
 

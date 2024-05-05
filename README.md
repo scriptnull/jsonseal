@@ -62,7 +62,7 @@ func (r *PaymentRequest) Validate() error {
 
 	payment.Check(func() error {
 		if !slices.Contains(SupportedPaymentModes, r.Payment.Mode) {
-			return fmt.Errorf("unsupported payment mode")
+			return fmt.Errorf("unsupported payment mode: %s", r.Payment.Mode)
 		}
 
 		return nil

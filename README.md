@@ -6,10 +6,10 @@
   <span>A JSON validator for Go { ❓ 🧐 ❓ }</span>
   <br><br>
 
-  [![Tests](https://github.com/scriptnull/jsonseal/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/scriptnull/jsonseal/actions/workflows/test.yml)
-  [![Go Reference](https://pkg.go.dev/badge/github.com/scriptnull/jsonseal.svg)](https://pkg.go.dev/github.com/scriptnull/jsonseal)
+[![Tests](https://github.com/scriptnull/jsonseal/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/scriptnull/jsonseal/actions/workflows/test.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/scriptnull/jsonseal.svg)](https://pkg.go.dev/github.com/scriptnull/jsonseal)
 
-  🚧 Work In Progress 🚧
+🚧 Work In Progress 🚧
 
 </div>
 
@@ -105,7 +105,9 @@ err2 := grp2.Validate()
 ```
 
 ### Errors
+
 jsonseal comes with built-in error formatters for convenience.
+
 ```go
 err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
 if err != nil {
@@ -125,6 +127,7 @@ if err != nil {
 ```
 
 But if you wish to get a Go struct that denotes all the validation errors, you could get it like this:
+
 ```go
 err := jsonseal.Unmarshal(paymentRequestWithInsufficientFunds, &paymentRequest)
 if err != nil {
@@ -199,3 +202,14 @@ This will make sure to associate both fields with the error in case of the valid
   "error": "sender and receiver are not friends"
 }
 ```
+
+### Drop-in replacements
+
+jsonseal provides drop-in replacements for a few things in [encoding/json](https://pkg.go.dev/encoding/json) package. This is to ensure API compatibility and seamless migration experience.
+
+- `jsonseal.Unmarshal` could be used in the place of `json.Unmarshal`
+- `jsonseal.Decoder` could be used in the place of `json.Decoder`
+  ```go
+  // json.Decoder could be replaced with jsonseal.Decoder
+  err = jsonseal.NewDecoder(data).Decode(&v)
+  ```

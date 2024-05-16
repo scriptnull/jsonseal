@@ -39,7 +39,7 @@ func TestDecoderWithUknownFieldSuggestion(t *testing.T) {
 		type Data struct {
 			ExpiresIn      int    `json:"expires_in"`
 			Balance        int    `json:"balance,omitempty"`
-			unexposedField string //nolint:staticcheck
+			unexposedField string //nolint:unused
 			PrivateField   string `json:"-"`
 		}
 		rawData := `{ "expires": 50 }`
@@ -55,7 +55,7 @@ func TestDecoderWithUknownFieldSuggestion(t *testing.T) {
 		type Data struct {
 			ExpiresIn      int    `json:"expires_in"`
 			Balance        int    `json:"balance,omitempty"`
-			unexposedField string //nolint:staticcheck
+			unexposedField string //nolint:unused
 			PrivateField   string `json:"-"`
 			ExportedField  string
 		}

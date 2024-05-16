@@ -12,7 +12,11 @@ type Error struct {
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("%s %s", strings.Join(e.Fields, ","), e.Err.Error())
+	if len(e.Fields) > 0 {
+		return fmt.Sprintf("%s %s", strings.Join(e.Fields, ","), e.Err.Error())
+	}
+
+	return e.Err.Error()
 }
 
 func (e *Error) String() string {

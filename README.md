@@ -210,6 +210,5 @@ jsonseal provides drop-in replacements for a few things in [encoding/json](https
 - `jsonseal.Unmarshal` could be used in the place of `json.Unmarshal`
 - `jsonseal.Decoder` could be used in the place of `json.Decoder`
   ```go
-  // json.Decoder could be replaced with jsonseal.Decoder
   err = jsonseal.NewDecoder(data).Decode(&v)
   ```

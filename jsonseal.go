@@ -14,6 +14,7 @@ type Validator interface {
 	Validate() error
 }
 
+// Unmarshal is a drop-in replacement for the standard library json.Unmarshal
 func Unmarshal(data []byte, v Validator) error {
 	err := json.Unmarshal(data, v)
 	if err != nil {

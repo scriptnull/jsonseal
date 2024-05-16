@@ -31,7 +31,7 @@ func (dec *Decoder) UseNumber() { dec.d.UseNumber() }
 
 func (dec *Decoder) DisallowUnknownFields() { dec.d.DisallowUnknownFields() }
 
-func (dec *Decoder) Decode(v any) error {
+func (dec *Decoder) Decode(v Validator) error {
 	err := dec.d.Decode(v)
 	if err != nil {
 		if dec.unknownFieldSuggestion && strings.HasPrefix(err.Error(), unknownFieldErrPrefix) {
@@ -61,6 +61,11 @@ func (dec *Decoder) Decode(v any) error {
 				}
 			}
 		}
+	}
+
+	err = v.Validate()
+	if err != nil {
+		return err
 	}
 
 	return err

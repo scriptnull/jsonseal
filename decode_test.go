@@ -70,7 +70,7 @@ func TestDecoderWithUnknownFieldSuggestion(t *testing.T) {
 		}
 		rawData := `{ "exported": 50 }`
 		expectedError := `{"errors":[{"fields":["exported"],"error":"unknown field. Did you mean \"ExportedField\""}]}`
-		var d Data
+		var d Data2
 		err := jsonseal.NewDecoder(strings.NewReader(rawData)).WithUnknownFieldSuggestion().Decode(&d)
 		if jsonseal.JSONFormat(err) != expectedError {
 			t.Errorf("expected: %s, got %s", expectedError, jsonseal.JSONFormat(err))

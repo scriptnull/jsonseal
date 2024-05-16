@@ -27,6 +27,9 @@ func TestDecoder(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		jsonseal.NewDecoder(strings.NewReader(tc.input)).Decode(&tc.decodedAt)
+		err := jsonseal.NewDecoder(strings.NewReader(tc.input)).Decode(&tc.decodedAt)
+		if err != nil {
+			t.Error(err)
+		}
 	}
 }

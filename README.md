@@ -87,6 +87,11 @@ if err != nil {
 ```
 
 ## API
+- [Check Groups](#check-groups)
+- [Errors](#errors)
+- [Fields](#fields)
+- [Drop-in Replacements](#drop-in-replacements)
+- [Unknown Field Suggestions](#unknown-field-suggestions)
 
 ### Check Groups
 

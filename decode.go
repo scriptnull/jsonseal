@@ -85,15 +85,20 @@ func jsonFields(v any) []string {
 	fieldsCount := reflect.Indirect(val).NumField()
 	fields := make([]string, 0, fieldsCount)
 	for i := 0; i < fieldsCount; i++ {
-		field := reflect.Indirect(val).Type().Field(i).Tag.Get("json")
-		if field == "" || field == "-" {
+		field := reflect.Indirect(val).Type().Field(i)
+		fieldTag, jsonTagPresent := field.Tag.Lookup("json")
+		if !jsonTagPresent && field.IsExported() {
+			fields = append(fields, field.Name)
 			continue
 		}
-		if split := strings.Split(field, ","); len(split) > 1 {
+		if fieldTag == "" || fieldTag == "-" {
+			continue
+		}
+		if split := strings.Split(fieldTag, ","); len(split) > 1 {
 			fields = append(fields, split[0])
 			continue
 		}
-		fields = append(fields, field)
+		fields = append(fields, fieldTag)
 	}
 	return fields
 }

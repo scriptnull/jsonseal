@@ -12,6 +12,10 @@ type Error struct {
 }
 
 func (e *Error) Error() string {
+	if len(e.Fields) > 0 {
+		return fmt.Sprintf("%s %s", strings.Join(e.Fields, ","), e.Err.Error())
+	}
+
 	return e.Err.Error()
 }
 

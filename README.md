@@ -87,6 +87,11 @@ if err != nil {
 ```
 
 ## API
+- [Check Groups](#check-groups)
+- [Errors](#errors)
+- [Fields](#fields)
+- [Drop-in Replacements](#drop-in-replacements)
+- [Unknown Field Suggestions](#unknown-field-suggestions)
 
 ### Check Groups
 
@@ -203,13 +208,48 @@ This will make sure to associate both fields with the error in case of the valid
 }
 ```
 
-### Drop-in replacements
+### Drop-in Replacements
 
 jsonseal provides drop-in replacements for a few things in [encoding/json](https://pkg.go.dev/encoding/json) package. This is to ensure API compatibility and seamless migration experience.
 
 - `jsonseal.Unmarshal` could be used in the place of `json.Unmarshal`
 - `jsonseal.Decoder` could be used in the place of `json.Decoder`
   ```go
-  // json.Decoder could be replaced with jsonseal.Decoder
   err = jsonseal.NewDecoder(data).Decode(&v)
   ```
+
+### Unknown Field Suggestions
+
+It might be useful to validate if the JSON data contains only the fields that are expected by the struct to which it is decoded to.
+
+Example: A user sends `{"expires": 50}` as the JSON data but our code expects it to be `{"expires_in": 50}`. If you are using `json` package, you might enable this validation by calling `DisallowUnknownFields()` on the `json.Decoder`. That will give you an error like `json: unknown field "expires"`.
+
+jsonseal provides `WithUnknownFieldSuggestion()` method which takes the error message to the next level by suggesting the right field name based on the [Levenshtein Distance](https://en.wikipedia.org/wiki/Levenshtein_distance) between the wrongly typed field name and all possible field names of the struct that we are decoding to.
+
+```go
+type Data struct {
+  ExpiresIn      int    `json:"expires_in"`
+  Balance        int    `json:"balance,omitempty"`
+  PrivateField   string `json:"-"`
+}
+var d Data
+err := jsonseal.NewDecoder(data).WithUnknownFieldSuggestion().Decode(&d)
+if err != nil {
+  fmt.Println(jsonseal.JSONIndentFormat(err, "", "  "))
+}
+```
+
+This gives the following error
+
+```json
+{
+  "errors": [
+    {
+      "fields": ["expires"],
+      "error": "unknown field. Did you mean \"expires_in\""
+    }
+  ]
+}
+```
+
+Thanks to [this blog post](https://brandur.org/disallow-unknown-fields) for providing inspiration and motivation for this feature in jsonseal :pray:.

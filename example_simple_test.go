@@ -49,7 +49,7 @@ func (r *SimplePaymentRequest) Validate() error {
 
 	payment.Field("payment.mode").Check(func() error {
 		if !slices.Contains(SupportedPaymentModes, r.Payment.Mode) {
-			return fmt.Errorf("unsupported payment mode: %s", r.Payment.Mode)
+			return fmt.Errorf(`"%s" is unsupported`, r.Payment.Mode)
 		}
 
 		return nil
@@ -81,10 +81,10 @@ func Example_simple() {
 	// Output:
 	// Plain error
 	// insufficient balance
-	// unsupported payment mode: neft
+	// payment.mode "neft" is unsupported
 	//
 	// JSON error
-	// {"errors":[{"error":"insufficient balance"},{"fields":["payment.mode"],"error":"unsupported payment mode: neft"}]}
+	// {"errors":[{"error":"insufficient balance"},{"fields":["payment.mode"],"error":"\"neft\" is unsupported"}]}
 	//
 	// JSON error with indent
 	// {
@@ -96,7 +96,7 @@ func Example_simple() {
 	//       "fields": [
 	//         "payment.mode"
 	//       ],
-	//       "error": "unsupported payment mode: neft"
+	//       "error": "\"neft\" is unsupported"
 	//     }
 	//   ]
 	// }

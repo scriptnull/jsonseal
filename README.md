@@ -215,15 +215,20 @@ jsonseal provides drop-in replacements for a few things in [encoding/json](https
 
 ### Unknown Field Suggestions
 
-It might be useful to error out when the JSON data contains fields that are not defined in the JSON struct to which we are decoding it to.
+It might be useful to validate if the JSON data contains only the fields that are expected by the struct to which it is decoded to.
 
-Example: a user sends `{ "expires": 50}` as the JSON data but our code expects it to be `{ "expires_in": 50}`. If you are using `json` package, you might enable this validation by calling `DisallowUnknownFields()` on the `json.Decoder`. That will give you an error like `json: unknown field "expires"`.
+Example: A user sends `{"expires": 50}` as the JSON data but our code expects it to be `{"expires_in": 50}`. If you are using `json` package, you might enable this validation by calling `DisallowUnknownFields()` on the `json.Decoder`. That will give you an error like `json: unknown field "expires"`.
 
-jsonseal provides `WithUknownFieldSuggestion()` method which takes the error message to next level by suggesting the right field name based on the [Levenshtein Distance](https://en.wikipedia.org/wiki/Levenshtein_distance) between the wrongly typed field name and all possible field names of the struct that we are decoding to.
+jsonseal provides `WithUnknownFieldSuggestion()` method which takes the error message to the next level by suggesting the right field name based on the [Levenshtein Distance](https://en.wikipedia.org/wiki/Levenshtein_distance) between the wrongly typed field name and all possible field names of the struct that we are decoding to.
 
 ```go
-
-err := jsonseal.NewDecoder(data).WithUknownFieldSuggestion().Decode(&d)
+type Data struct {
+  ExpiresIn      int    `json:"expires_in"`
+  Balance        int    `json:"balance,omitempty"`
+  PrivateField   string `json:"-"`
+}
+var d Data
+err := jsonseal.NewDecoder(data).WithUnknownFieldSuggestion().Decode(&d)
 if err != nil {
   fmt.Println(jsonseal.JSONIndentFormat(err, "", "  "))
 }
@@ -241,3 +246,5 @@ This gives the following error
   ]
 }
 ```
+
+Thanks to [this blog post](https://brandur.org/disallow-unknown-fields) for providing inspiration and motivation for this feature in jsonseal :pray:.

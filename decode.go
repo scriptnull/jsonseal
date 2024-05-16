@@ -74,7 +74,7 @@ func (dec *Decoder) More() bool { return dec.d.More() }
 
 func (dec *Decoder) Token() (json.Token, error) { return dec.d.Token() }
 
-func (dec *Decoder) WithUknownFieldSuggestion() *Decoder {
+func (dec *Decoder) WithUnknownFieldSuggestion() *Decoder {
 	dec.unknownFieldSuggestion = true
 	dec.DisallowUnknownFields()
 	return dec

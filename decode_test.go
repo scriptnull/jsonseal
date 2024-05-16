@@ -34,7 +34,7 @@ func TestDecoder(t *testing.T) {
 	}
 }
 
-func TestDecoderWithUknownFieldSuggestion(t *testing.T) {
+func TestDecoderWithUnknownFieldSuggestion(t *testing.T) {
 	t.Run("simple json struct tag", func(t *testing.T) {
 		type Data struct {
 			ExpiresIn      int    `json:"expires_in"`
@@ -45,7 +45,7 @@ func TestDecoderWithUknownFieldSuggestion(t *testing.T) {
 		rawData := `{ "expires": 50 }`
 		expectedError := `{"errors":[{"fields":["expires"],"error":"unknown field. Did you mean \"expires_in\""}]}`
 		var d Data
-		err := jsonseal.NewDecoder(strings.NewReader(rawData)).WithUknownFieldSuggestion().Decode(&d)
+		err := jsonseal.NewDecoder(strings.NewReader(rawData)).WithUnknownFieldSuggestion().Decode(&d)
 		if jsonseal.JSONFormat(err) != expectedError {
 			t.Errorf("expected: %s, got %s", expectedError, jsonseal.JSONFormat(err))
 		}
@@ -62,7 +62,7 @@ func TestDecoderWithUknownFieldSuggestion(t *testing.T) {
 		rawData := `{ "exported": 50 }`
 		expectedError := `{"errors":[{"fields":["exported"],"error":"unknown field. Did you mean \"ExportedField\""}]}`
 		var d Data
-		err := jsonseal.NewDecoder(strings.NewReader(rawData)).WithUknownFieldSuggestion().Decode(&d)
+		err := jsonseal.NewDecoder(strings.NewReader(rawData)).WithUnknownFieldSuggestion().Decode(&d)
 		if jsonseal.JSONFormat(err) != expectedError {
 			t.Errorf("expected: %s, got %s", expectedError, jsonseal.JSONFormat(err))
 		}

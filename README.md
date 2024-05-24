@@ -218,7 +218,7 @@ jsonseal provides drop-in replacements for a few things in [encoding/json](https
   err = jsonseal.NewDecoder(data).Decode(&v)
   ```
 
-If you wish to ensure that `jsonseal.Validator` interface is satisfied by validation input, you could use the below alternatives:
+If you wish to ensure that `jsonseal.Validator` interface was implemented by the input at compile time, you could use the below alternatives:
 - `jsonseal.UnmarshalValidate` could be used instead of `jsonseal.Unmarshal`.
 - `jsonseal.DecodeValidate` could be used instead of `jsonseal.Decode`.
 

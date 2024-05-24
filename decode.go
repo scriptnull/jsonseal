@@ -31,7 +31,7 @@ func (dec *Decoder) UseNumber() { dec.d.UseNumber() }
 
 func (dec *Decoder) DisallowUnknownFields() { dec.d.DisallowUnknownFields() }
 
-func (dec *Decoder) Decode(v Validator) error {
+func (dec *Decoder) Decode(v any) error {
 	err := dec.d.Decode(v)
 	if err != nil {
 		if dec.unknownFieldSuggestion && strings.HasPrefix(err.Error(), unknownFieldErrPrefix) {
@@ -63,12 +63,18 @@ func (dec *Decoder) Decode(v Validator) error {
 		}
 	}
 
-	err = v.Validate()
-	if err != nil {
-		return err
+	if vv, ok := v.(Validator); ok {
+		err = vv.Validate()
+		if err != nil {
+			return err
+		}
 	}
 
 	return err
+}
+
+func (dec *Decoder) DecodeValidate(v Validator) error {
+	return dec.Decode(v)
 }
 
 func (dec *Decoder) Buffered() io.Reader { return dec.d.Buffered() }

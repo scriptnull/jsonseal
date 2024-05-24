@@ -218,6 +218,16 @@ jsonseal provides drop-in replacements for a few things in [encoding/json](https
   err = jsonseal.NewDecoder(data).Decode(&v)
   ```
 
+If you wish to ensure that `jsonseal.Validator` interface was implemented by the input at compile time, you could use the below alternatives:
+- `jsonseal.UnmarshalValidate` could be used instead of `jsonseal.Unmarshal`.
+- `jsonseal.DecodeValidate` could be used instead of `jsonseal.Decode`.
+
+Alternatively, you could also do the following to ensure the compile time guarantee.
+
+```go
+var _ jsonseal.Validator = &PaymentRequest{}
+```
+
 ### Unknown Field Suggestions
 
 It might be useful to validate if the JSON data contains only the fields that are expected by the struct to which it is decoded to.

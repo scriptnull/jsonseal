@@ -61,6 +61,10 @@ func TestDecoderWithUnknownFieldSuggestion(t *testing.T) {
 		if jsonseal.JSONFormat(err) != expectedError {
 			t.Errorf("expected: %s, got %s", expectedError, jsonseal.JSONFormat(err))
 		}
+		err = jsonseal.NewDecoder(strings.NewReader(rawData)).WithUnknownFieldSuggestion().DecodeValidate(&d)
+		if jsonseal.JSONFormat(err) != expectedError {
+			t.Errorf("expected: %s, got %s", expectedError, jsonseal.JSONFormat(err))
+		}
 	})
 
 	t.Run("Exported field in struct", func(t *testing.T) {
@@ -72,6 +76,10 @@ func TestDecoderWithUnknownFieldSuggestion(t *testing.T) {
 		expectedError := `{"errors":[{"fields":["exported"],"error":"unknown field. Did you mean \"ExportedField\""}]}`
 		var d Data2
 		err := jsonseal.NewDecoder(strings.NewReader(rawData)).WithUnknownFieldSuggestion().Decode(&d)
+		if jsonseal.JSONFormat(err) != expectedError {
+			t.Errorf("expected: %s, got %s", expectedError, jsonseal.JSONFormat(err))
+		}
+		err = jsonseal.NewDecoder(strings.NewReader(rawData)).WithUnknownFieldSuggestion().DecodeValidate(&d)
 		if jsonseal.JSONFormat(err) != expectedError {
 			t.Errorf("expected: %s, got %s", expectedError, jsonseal.JSONFormat(err))
 		}
